@@ -1,10 +1,5 @@
 base:
   '*':
     - common
+  'salt*':
     - server
-    - example
-server:
-  '*':
-    - common
-    - server
-    - example
