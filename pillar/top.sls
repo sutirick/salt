@@ -1,5 +1,4 @@
 base:
   '*':
     - common
-  'server':
     - server
