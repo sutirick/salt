@@ -1,5 +1,5 @@
 base:
   '*':
     - common
-  'salt*':
+  'role: server':
     - server
