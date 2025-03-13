@@ -1,0 +1,3 @@
+{% for server, addrs in salt['mine.get']('roles:server', 'network.ip_addrs', tgt_type='grain') | dictsort() %}
+server {{ server }} {{ addrs[0] }}:80 check
+{% endfor %}
