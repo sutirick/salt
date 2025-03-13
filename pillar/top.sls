@@ -1,4 +1,4 @@
-{{ saltenv }} :
+base:
   '*':
     - common
     - packages
