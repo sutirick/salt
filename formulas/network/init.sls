@@ -2,5 +2,5 @@
 {% from "map.jinja" import network with context %}
 
 include:
-  - network.service
-  - network.network
+  - service
+  - network
