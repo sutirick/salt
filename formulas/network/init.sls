@@ -3,4 +3,4 @@
 
 include:
   - network.service
-  - network.nmcli
+  - network.network
