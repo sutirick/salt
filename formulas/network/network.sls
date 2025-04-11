@@ -12,7 +12,7 @@ configure_{{ iface }}:
           ifname {{ iface }} \
           ipv4.method {{ 'auto' if params.get('dhcp', False) else 'manual' }} \
           {% if not params.get('dhcp', False) %}ipv4.addresses {{ params.ip }}/{{ params.get('netmask', '24') }} \
-          ipv4.gateway {{ params.gateway }}{% endif %}
+          {% if params.get('gateway') %}ipv4.gateway {{ params.gateway }}{% endif %}{% endif %}
     - unless: nmcli -g NAME con show | grep -q "{{ params.get('conn_name', iface) }}"
     - env:
       - DBUS_SESSION_BUS_ADDRESS: unix:path=/run/dbus/system_bus_socket
