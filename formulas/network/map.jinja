@@ -1,0 +1,10 @@
+# /srv/salt/formulas/network/map.jinja
+{% set network = salt['grains.filter_by']({
+    'default': {
+        'service_name': 'NetworkManager',
+        'config_dir': '/etc/NetworkManager/system-connections',
+    },
+    'Debian': {
+        'service_name': 'network-manager',
+    },
+}, merge=salt['pillar.get']('network:lookup')) %}
