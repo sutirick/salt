@@ -4,41 +4,25 @@
 
 {% for iface, params in interfaces.items() %}
 configure_{{ iface }}:
-  nmcli.managed:
-    - name: {{ iface }}
-    - conn_name: {{ params.get('conn_name', iface) }}
-    - type: {{ params.type }}
-    - autoconnect: {{ params.get('autoconnect', True) }}
+  cmd.run:
+    - name: |
+        nmcli con del "{{ params.get('conn_name', iface) }}" || true
+        nmcli con add type {{ params.type }} \
+          con-name "{{ params.get('conn_name', iface) }}" \
+          ifname {{ iface }} \
+          ipv4.method {{ 'auto' if params.get('dhcp', False) else 'manual' }} \
+          {% if not params.get('dhcp', False) %}ipv4.addresses {{ params.ip }}/{{ params.get('netmask', '24') }} \
+          ipv4.gateway {{ params.gateway }}{% endif %}
+    - unless: nmcli -g NAME con show | grep -q "{{ params.get('conn_name', iface) }}"
+    - env:
+      - DBUS_SESSION_BUS_ADDRESS: unix:path=/run/dbus/system_bus_socket
 
-    {# DHCP или статический IP #}
-    {% if params.get('dhcp', False) %}
-    - ip4: dhcp
-    {% else %}
-    - ip4: {{ params.ip }}/{{ params.get('netmask', '24') }}
-    - gw4: {{ params.gateway }}
-    {% endif %}
-
-    {# DNS #}
-    {% if params.get('dns') %}
-    - dns: {{ params.dns | to_json }}
-    {% endif %}
-
-    {# Опции для bonding #}
-    {% if params.type == 'bond' %}
-    - bond_opts: {{ params.get('bond_opts', {}) | dictsort | join(',') }}
-    {% endif %}
-
-    {# Slave-интерфейсы #}
-    {% for slave in params.get('slaves', []) %}
-configure_slave_{{ slave }}:
-  nmcli.managed:
-    - name: {{ slave }}
-    - conn_name: {{ slave }}-slave
-    - type: bond-slave
-    - master: {{ iface }}
-    - autoconnect: True
-    - require:
-      - nmcli: configure_{{ iface }}
-    {% endfor %}
-
+{% if not params.get('dhcp', False) and params.get('dns') %}
+set_dns_for_{{ iface }}:
+  cmd.run:
+    - name: |
+        nmcli con mod "{{ params.get('conn_name', iface) }}" \
+          ipv4.dns "{{ params.dns|join(' ') }}"
+    - unless: nmcli -g IP4.DNS con show "{{ params.get('conn_name', iface) }}" | grep -q "{{ params.dns[0] }}"
+{% endif %}
 {% endfor %}
