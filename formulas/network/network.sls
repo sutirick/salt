@@ -1,5 +1,5 @@
 # /srv/salt/formulas/network/nmcli.sls
-{% from "network/map.jinja" import network with context %}
+{% from "map.jinja" import network with context %}
 {% set interfaces = salt['pillar.get']('network:interfaces', {}) %}
 
 {% for iface, params in interfaces.items() %}

@@ -1,5 +1,5 @@
 # /srv/salt/formulas/network/service.sls
-{% from "network/map.jinja" import network with context %}
+{% from "map.jinja" import network with context %}
 
 network_manager_service:
   service.running:
