@@ -7,4 +7,7 @@
     'Debian': {
         'service_name': 'network-manager',
     },
+    'Ubuntu': {
+        'service_name': 'network-manager',
+    },
 }, merge=salt['pillar.get']('network:lookup')) %}
